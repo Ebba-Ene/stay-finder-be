@@ -54,7 +54,7 @@ auth.post("/login", loginValidator, async (c) => {
 })
 
 //POST LOGOUT
-auth.post("/logut", requireAuth, async (c) => {
+auth.post("/logout", requireAuth, async (c) => {
   try{
         const sb = c.get("supabase")
         await logoutUser(sb)
