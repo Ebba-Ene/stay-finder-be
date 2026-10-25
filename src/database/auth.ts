@@ -23,7 +23,7 @@ export async function registerUser(sb: BasicSupabaseClient, email: string, passw
   throw error;
 }
 
-export async function signInUser(sb: BasicSupabaseClient, email: string, password: string) {
+export async function loginUser(sb: BasicSupabaseClient, email: string, password: string) {
   const {data, error} = await sb.auth.signInWithPassword({
     email,
     password
@@ -39,7 +39,7 @@ export async function signInUser(sb: BasicSupabaseClient, email: string, passwor
   throw error;
 }
 
-export async function signOutUser(sb: BasicSupabaseClient, email: string, password: string) {
+export async function logoutUser(sb: BasicSupabaseClient) {
   const { error} = await sb.auth.signOut()
 
   if (error ) {
