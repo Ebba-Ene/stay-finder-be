@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import auth from './routes/auth.js'
 import { optionalAuth } from './middleware/auth.js'
+import properties from './routes/properties.js'
 
 const app = new Hono({strict: false})
 
@@ -12,6 +13,7 @@ app.get('/', (c) => {
 })
 
 app.route("/auth", auth)
+app.route("/properties", properties)
 
 serve({
   fetch: app.fetch,
