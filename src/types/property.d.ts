@@ -1,12 +1,11 @@
-type PropertyKind = "apartment" | "villa"
+import type { Database } from "./database.types.js"
 
-interface Property {
-  title: string;
-  description: string;
-  location: string;
-  price_per_night: number;
-  max_guests: number;
-  kind: PropertyKind;
-  property_id: string;
-  created_at: string;
-}
+export type PropertyKind = "apartment" | "villa"
+
+export type Property = Database["public"]["Tables"]["properties"]["Row"]
+
+type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"]
+
+export type NewProperty = Omit<Property, "property_id" | "created_at" | "owner_id">
+
+export type PropertyValidKey = keyof Property
