@@ -61,12 +61,34 @@ auth.post("/logout", requireAuth, async (c) => {
 
         c.set("user", null)
 
-        return c.json({
-          message: "Logged Out"
-        }, 200
+        return c.json(
+          {
+            message: "Logged Out"
+          }, 200
         )
   } catch(e: any) {
     console.warn("Error in logging out", e)
+    return c.json(
+      {
+        message: e?.message
+      },
+      400
+    )
+  }
+})
+
+auth.get("/me", requireAuth, async (c) => {
+  try{
+    const user = c.get("user")
+
+    return c.json(
+      {
+        user
+      }, 200
+    )
+
+  } catch(e: any) {
+    console.warn("Error in getting user", e)
     return c.json(
       {
         message: e?.message
