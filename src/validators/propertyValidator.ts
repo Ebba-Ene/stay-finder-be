@@ -27,5 +27,19 @@ export const propertyValidator = zValidator(
   }
 )
 
+const propertyParamSchema = z.object({
+  kind: z.enum<PropertyKind[]>(
+    ["apartment", "villa"],
+    `Param must be one of "apartment", "villa"`,
+  ),
+})
 
-
+export const propertyParamValidator = zValidator(
+  "param",
+  propertyParamSchema,
+  (result, c) => {
+    if (!result.success) {
+      return c.json(getValidationError(result.error), 400);
+    }
+  },
+)
