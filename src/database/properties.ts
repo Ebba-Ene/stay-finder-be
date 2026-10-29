@@ -23,6 +23,7 @@ const SELECT_QUERY_LIST: PropertyValidKey[] = [
 const SELECT_QUERY= SELECT_QUERY_LIST.join(", ")
 const QUERY_ID = "property_id"
 const QUERY_KIND = "kind_of_property"
+const QUERY_OWNERID = "owner_id"
 
 function selectProperties(sb: BasicSupabaseClient){
   return sb.from(TABLE_NAME).select(SELECT_QUERY)
@@ -164,3 +165,15 @@ export async function deletePropertyById(
 }
 
 //GET MY PROPERTIES IF OWNER AND LOGGED IN
+export async function getOwnedProperties(sb: BasicSupabaseClient, ownerId: string){
+  const {error, data}: PostgrestSingleResponse<Property[]> = await sb
+  .from(TABLE_NAME)
+  .select()
+  .eq("owner_id", ownerId)
+
+  if(error){
+    throw error
+  }
+
+  return data
+}

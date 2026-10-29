@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { User } from "@supabase/supabase-js";
 
-import { createProperty, deletePropertyById, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
+import { createProperty, deletePropertyById, getOwnedProperties, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
 import { propertyOptionalValidator, propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
 import { requireAuth } from "../middleware/auth.js";
 import type { Property } from "../types/property.js";
@@ -27,7 +27,7 @@ properties.get("/", async (c) => {
 })
 
 //GET PROPERTY BY ID FOR DETAIL VIEW
-properties.get("/:id", async (c) => {
+properties.get("id/:id", async (c) => {
   const propertyId = c.req.param("id")
   const sb = c.get("supabase")
 
@@ -116,5 +116,21 @@ properties.delete("/:id", requireAuth, async (c) => {
 })
 
 //GET MY PROPERTIES IF OWNER AND LOGGED IN
+properties.get("/mine", requireAuth, async (c) => {
+  const sb = c.get("supabase")
+  const user = c.get("user")
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
+
+  try{
+    const properties = await getOwnedProperties(sb, user.id)
+    return c.json(properties)
+  } catch(e) {
+    console.warn("Error in fetching properties from SB database", e)
+    return c.json([])
+  }
+})
 
 export default properties;
