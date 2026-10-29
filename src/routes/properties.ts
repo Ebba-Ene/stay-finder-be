@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { User } from "@supabase/supabase-js";
 
-import { createProperty, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
+import { createProperty, deletePropertyById, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
 import { propertyOptionalValidator, propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
 import { requireAuth } from "../middleware/auth.js";
 import type { Property } from "../types/property.js";
@@ -97,6 +97,23 @@ properties.patch("/:id", requireAuth, propertyOptionalValidator, async (c) => {
 })
 
 //DELETE PROPERTY IF OWNER AND LOGGED IN
+properties.delete("/:id", requireAuth, async (c) => {
+  const propertyId = c.req.param("id")
+  const sb = c.get("supabase")
+
+  if (!propertyId) {
+    return c.json({ error: "Property ID is required" }, 400)
+  }
+
+  try{
+    await deletePropertyById(sb, propertyId)
+
+    return c.json(null, 200)
+  } catch (e) {
+    console.warn("Error in deleting property into SB DB", e);
+    return c.json(null, 404);
+  } 
+})
 
 //GET MY PROPERTIES IF OWNER AND LOGGED IN
 
