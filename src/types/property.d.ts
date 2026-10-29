@@ -1,6 +1,6 @@
 import type { Database } from "./database.types.js"
 
-export type PropertyKind = "apartment" | "villa"
+export type PropertyKind = "Apartment" | "Villa"
 
 export type Property = Database["public"]["Tables"]["properties"]["Row"]
 
