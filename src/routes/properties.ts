@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import type { User } from "@supabase/supabase-js";
 
-import { createProperty, getProperties, getPropertiesByKind, getPropertyById } from "../database/properties.js";
-import { propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
+import { createProperty, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
+import { propertyOptionalValidator, propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
 import { requireAuth } from "../middleware/auth.js";
+import type { Property } from "../types/property.js";
 
 const properties = new Hono({ strict: false })
 
@@ -69,15 +70,31 @@ properties.post("/", requireAuth, propertyValidator, async (c) => {
       ...propertyBody,
       owner_id: user.id
     })
-    
+
     return c.json(newProperty, 201)
   } catch (e) {
-    console.warn("error in inserting property into SB DB", e);
+    console.warn("Error in inserting property into SB DB", e);
     return c.json(e, 500);
   } 
 })
 
 //PATCH PROPERTY IF OWNER AND LOGGED IN
+properties.patch("/:id", requireAuth, propertyOptionalValidator, async (c) => {
+  const propertyId = c.req.param("id");
+  let propertyBody: Partial<Property> = c.req.valid("json");
+  delete propertyBody.owner_id
+  delete propertyBody.property_id
+  const sb = c.get("supabase")
+
+    try{
+    const updatedProperty = await updatePropertyById(sb, propertyBody, propertyId)
+
+    return c.json(updatedProperty)
+  } catch (e) {
+    console.warn("Error in updating property into SB DB", e);
+    return c.json(null, 404);
+  } 
+})
 
 //DELETE PROPERTY IF OWNER AND LOGGED IN
 

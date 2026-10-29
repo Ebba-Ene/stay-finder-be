@@ -44,3 +44,15 @@ export const propertyParamValidator = zValidator(
     }
   },
 )
+
+const propertyOptionalSchema = propertySchema.partial()
+
+export const propertyOptionalValidator = zValidator(
+  "json",
+  propertyOptionalSchema,
+  (result, c) => {
+      if (!result.success) {
+      return c.json(getValidationError(result.error), 400);
+    }
+  }
+)

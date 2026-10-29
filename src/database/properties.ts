@@ -125,6 +125,24 @@ export async function createProperty(sb: BasicSupabaseClient, propertyBody: NewP
 }
 
 //PATCH PROPERTY IF OWNER AND LOGGED IN
+export async function updatePropertyById(
+  sb: BasicSupabaseClient, 
+  property: Partial<Property>, 
+  propertyId: string) 
+  {
+  const {error, data}: PostgrestSingleResponse<Property> = await sb
+    .from(TABLE_NAME)
+    .update(property)
+    .eq(QUERY_ID, propertyId)
+    .select()
+    .single()
+
+    if(error){
+      throw error
+    }
+
+    return data
+}
 
 //DELETE PROPERTY IF OWNER AND LOGGED IN
 
