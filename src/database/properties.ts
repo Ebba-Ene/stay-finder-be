@@ -114,3 +114,29 @@ export async function getPropertiesByKind(
 
   return data as any as Property[]
 }
+
+//createProperty
+export async function createProperty(sb: BasicSupabaseClient, propertyBody: NewProperty) {
+
+  const propertyToInsert = {
+  ...propertyBody,
+  kind_of_property: DATABASE_PROPERTY_KIND[propertyBody.kind_of_property],
+}
+  const {error, data}: PostgrestSingleResponse<Property> = await sb
+    .from(TABLE_NAME)
+    .insert(propertyToInsert)
+    .select(SELECT_QUERY)
+    .single()
+
+    if(error){
+      throw error
+    }
+
+    return data
+}
+
+//PATCH PROPERTY IF OWNER AND LOGGED IN
+
+//DELETE PROPERTY IF OWNER AND LOGGED IN
+
+//GET MY PROPERTIES IF OWNER AND LOGGED IN

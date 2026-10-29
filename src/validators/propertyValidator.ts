@@ -15,7 +15,8 @@ const propertySchema = z.object({
     `Must be one of "apartment" or "villa"`,
   ),
   property_id: z.string().optional(),
-  created_at: z.string().optional()
+  created_at: z.string().optional(),
+  image_url: z.string().optional()
 })
 
 export const propertyValidator = zValidator(

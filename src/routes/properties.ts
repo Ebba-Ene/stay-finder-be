@@ -1,6 +1,9 @@
 import { Hono } from "hono";
-import { getProperties, getPropertiesByKind, getPropertyById } from "../database/properties.js";
-import { propertyParamValidator } from "../validators/propertyValidator.js";
+import type { User } from "@supabase/supabase-js";
+
+import { createProperty, getProperties, getPropertiesByKind, getPropertyById } from "../database/properties.js";
+import { propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const properties = new Hono({ strict: false })
 
@@ -41,8 +44,6 @@ properties.get("/kind/:kind", propertyParamValidator, async (c) => {
  const kindOfProperty = c.req.valid("param").kind
   const sb = c.get("supabase")
 
-  console.log("Kind: ", kindOfProperty)
-
   try{
     const properties = await getPropertiesByKind(sb, kindOfProperty, {
       maxPrice: Number(c.req.query("max_price")) || undefined,
@@ -58,6 +59,23 @@ properties.get("/kind/:kind", propertyParamValidator, async (c) => {
 })
 
 //POST PROPERTY IF LOGGED IN
+properties.post("/", requireAuth, propertyValidator, async (c) => {
+  const propertyBody = c.req.valid("json")
+  const sb = c.get("supabase")
+  const user = c.get("user") as User
+
+  try{
+    const newProperty = await createProperty(sb, {
+      ...propertyBody,
+      owner_id: user.id
+    })
+    
+    return c.json(newProperty, 201)
+  } catch (e) {
+    console.warn("error in inserting property into SB DB", e);
+    return c.json(e, 500);
+  } 
+})
 
 //PATCH PROPERTY IF OWNER AND LOGGED IN
 
