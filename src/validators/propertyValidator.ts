@@ -11,7 +11,7 @@ const propertySchema = z.object({
     price_per_night: z.number().min(100, "Price per night needs to be a minimum of 100"),
     title: z.string().min(2, "Title is necessary"),
     kind_of_property: z.enum<PropertyKind[]>(
-    ["apartment", "villa"],
+    ["Apartment", "Villa"],
     `Must be one of "apartment" or "villa"`,
   ),
   property_id: z.string().optional(),
@@ -30,8 +30,8 @@ export const propertyValidator = zValidator(
 
 const propertyParamSchema = z.object({
   kind: z.enum<PropertyKind[]>(
-    ["apartment", "villa"],
-    `Param must be one of "apartment", "villa"`,
+    ["Apartment", "Villa"],
+    `Param must be one of "Apartment", "Villa"`,
   ),
 })
 

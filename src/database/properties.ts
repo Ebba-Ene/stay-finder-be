@@ -5,14 +5,6 @@ import type { Database } from "../types/database.types.js";
 import type { NewProperty, Property, PropertyKind, PropertyValidKey } from "../types/property.js";
 
 const TABLE_NAME = "properties"
-//Konverterar från API-värden till Supabase-enumen
-const DATABASE_PROPERTY_KIND: Record<
-  PropertyKind,
-  Database["public"]["Enums"]["property_kind"]
-  > = {
-  apartment: "Apartment",
-  villa: "Villa",
-}
 
 const SELECT_QUERY_LIST: PropertyValidKey[] = [
   "property_id",
@@ -102,7 +94,8 @@ export async function getPropertiesByKind(
   kindOfProperty: PropertyKind,
   filters: PropertyListFilter
 ): Promise<Property[]>{
-  const query = selectProperties(sb).eq(QUERY_KIND, DATABASE_PROPERTY_KIND[kindOfProperty])
+  const query = selectProperties(sb).eq(QUERY_KIND, kindOfProperty )
+
 
   buildPropertiesFilter(query, filters)
 
@@ -118,13 +111,9 @@ export async function getPropertiesByKind(
 //createProperty
 export async function createProperty(sb: BasicSupabaseClient, propertyBody: NewProperty) {
 
-  const propertyToInsert = {
-  ...propertyBody,
-  kind_of_property: DATABASE_PROPERTY_KIND[propertyBody.kind_of_property],
-}
   const {error, data}: PostgrestSingleResponse<Property> = await sb
     .from(TABLE_NAME)
-    .insert(propertyToInsert)
+    .insert(propertyBody)
     .select(SELECT_QUERY)
     .single()
 
