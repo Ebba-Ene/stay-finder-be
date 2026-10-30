@@ -26,6 +26,7 @@ export type Database = {
           owner_id: string | null
           property_id: string | null
           status: Database["public"]["Enums"]["booking_status"]
+          total_price: number
         }
         Insert: {
           booking_id?: string
@@ -38,6 +39,7 @@ export type Database = {
           owner_id?: string | null
           property_id?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          total_price: number
         }
         Update: {
           booking_id?: string
@@ -50,6 +52,7 @@ export type Database = {
           owner_id?: string | null
           property_id?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number
         }
         Relationships: [
           {
