@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 
 import { requireAuth } from "../middleware/auth.js";
-import { getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
+import { getBookingById, getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
+import type { Booking } from "../types/booking.js";
+import { getPropertyById, updatePropertyById } from "../database/properties.js";
+import { bookingValidator } from "../validators/bookingValidator.js";
+import type { User } from "@supabase/supabase-js";
 
 
 const bookings = new Hono({strict: false})
@@ -39,6 +43,24 @@ bookings.get("/properties/mine", requireAuth, async (c) => {
   } catch (e) {
     console.warn("Error in fetching bookings from SB database", e)
     return c.json([])
+  }
+})
+
+//GET BOOKING BY ID
+bookings.get("/:id", requireAuth, async (c) => {
+  const bookingId = c.req.param("id")
+  const sb = c.get("supabase")
+
+  if (!bookingId) {
+    return c.json({ error: "Booking ID is required" }, 400)
+  }
+
+  try{
+    const property = await getBookingById(sb, bookingId)
+    return c.json(property)
+  } catch (e) {
+    console.warn("Error in fetching booking from SB database", e)
+    return c.json(null, 404) 
   }
 })
 
