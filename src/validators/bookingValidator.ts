@@ -32,3 +32,21 @@ export const bookingValidator = zValidator(
     }
   }
 )
+
+const bookingOptionalSchema = bookingObject
+  .partial()
+  .refine(
+    (data) =>
+      !data.check_in || !data.check_out || data.check_in <= data.check_out,
+    dateOrder,
+  )
+
+export const bookingOptionalValidator = zValidator(
+  "json",
+  bookingOptionalSchema,
+  (result, c) => {
+    if(!result.success) {
+      return c.json(getValidationError(result.error), 400)
+    }
+  }
+)

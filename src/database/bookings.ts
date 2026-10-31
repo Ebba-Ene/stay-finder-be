@@ -82,6 +82,23 @@ export async function createBooking(
     return data
 }
 
+export async function updateBookingById(
+  sb: BasicSupabaseClient, booking: Partial<Booking>, bookingId: string
+) {
+  const {error, data}: PostgrestSingleResponse<Booking> = await sb
+    .from(TABLE_NAME)
+    .update(booking)
+    .eq(QUERY_ID, bookingId)
+    .select()
+    .single()
+
+  if(error){
+    throw error
+  }
+
+  return data
+}
+
 export async function deleteBookingById(
   sb: BasicSupabaseClient,
   bookingId: string
