@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
 import { requireAuth } from "../middleware/auth.js";
-import { createBooking, getBookingById, getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
+import { createBooking, deleteBookingById, getBookingById, getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
 import type { Booking } from "../types/booking.js";
 import { getPropertyById, updatePropertyById } from "../database/properties.js";
 import { bookingValidator } from "../validators/bookingValidator.js";
@@ -90,6 +90,23 @@ bookings.post("/property/:id", requireAuth, bookingValidator, async (c) => {
 //OWNER OF BOOKING CAN CANCELL
 //Cannot UPDATE PRICE, property_id, owner_id
 
-//OWNER CAN DELETE BOOKING IF CANCELLED
+//OWNER CAN DELETE BOOKING
+bookings.delete("/:id", requireAuth, async (c) => {
+  const bookingId = c.req.param("id")
+  const sb = c.get("supabase")
+  
+  if (!bookingId) {
+    return c.json({ error: "Booking ID is required" }, 400)
+  }
+
+  try{
+    await deleteBookingById(sb, bookingId)
+
+    return c.json(null, 200)
+  } catch (e) {
+    console.warn("Error in deleting booking into SB DB", e);
+    return c.json(null, 404);
+  } 
+})
 
 export default bookings;

@@ -81,3 +81,21 @@ export async function createBooking(
 
     return data
 }
+
+export async function deleteBookingById(
+  sb: BasicSupabaseClient,
+  bookingId: string
+){
+  const {error, data}: PostgrestSingleResponse<Booking> = await sb
+  .from(TABLE_NAME)
+  .delete()
+  .eq(QUERY_ID, bookingId)
+  .select()
+  .single() 
+
+  if(error){
+    throw error
+  }
+
+  return
+}
