@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
 import { requireAuth } from "../middleware/auth.js";
-import { getBookingById, getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
+import { createBooking, getBookingById, getMyBookings, getOwnedPropertiesBookings } from "../database/bookings.js";
 import type { Booking } from "../types/booking.js";
 import { getPropertyById, updatePropertyById } from "../database/properties.js";
 import { bookingValidator } from "../validators/bookingValidator.js";
@@ -64,7 +64,26 @@ bookings.get("/:id", requireAuth, async (c) => {
   }
 })
 
-//POST NEW BOOKING IF LOGGED IN AND NOT OWNER
+//POST NEW BOOKING IF LOGGED IN
+bookings.post("/property/:id", requireAuth, bookingValidator, async (c) => {
+  const bookingBody = c.req.valid("json")
+  const user = c.get("user") as User
+  const sb = c.get("supabase")
+  const propertyId = c.req.param("id")
+  
+  try{
+    const newBooking = await createBooking(sb, {
+      ...bookingBody,
+      owner_id: user.id,
+      property_id: propertyId
+    })
+
+    return c.json(newBooking, 201)
+  } catch (e) {
+    console.warn("Error in inserting booking into SB DB", e);
+    return c.json(e, 500);
+  } 
+})
 
 //PATCH BOOKING IF OWNER, can only patch email, name, number of guests, status
 //PROPERTY OWNER CAN UPDATE TO CONFIRMED OR CANCELLED

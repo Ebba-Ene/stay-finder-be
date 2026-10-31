@@ -64,3 +64,20 @@ export async function getBookingById(
 
   return data
 }
+
+export async function createBooking(
+  sb: BasicSupabaseClient, bookingBody: NewBooking
+) {
+
+  const {error, data}: PostgrestSingleResponse<Booking> = await sb
+    .from(TABLE_NAME)
+    .insert(bookingBody)
+    .select(SELECT_QUERY)
+    .single()
+
+    if(error){
+      throw error
+    }
+
+    return data
+}
