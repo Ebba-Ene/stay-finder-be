@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { loginUser, logoutUser, registerUser } from "../database/auth.js";
+import { getUser, loginUser, logoutUser, registerUser } from "../database/auth.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loginValidator, registerValidator } from "../validators/authValidator.js";
 
@@ -97,5 +97,22 @@ auth.get("/me", requireAuth, async (c) => {
     )
   }
 })
+
+auth.get("/me", requireAuth, async (c) => {
+  const sb = c.get("supabase")
+  
+  try{
+    const user = await getUser(sb)
+    return c.json({user}, 200)
+  } catch(e) {
+    console.warn("Error in getting user", e)
+    return c.json(
+      {
+        message: "Error in getting User"
+      }, 500
+    )
+  }
+})
+
 
 export default auth;
