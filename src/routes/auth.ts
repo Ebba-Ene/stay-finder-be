@@ -79,7 +79,8 @@ auth.post("/logout", requireAuth, async (c) => {
 
 auth.get("/me", requireAuth, async (c) => {
   try{
-    const user = c.get("user")
+    const sb = c.get("supabase")
+    const user = await getUser(sb)
 
     return c.json(
       {
