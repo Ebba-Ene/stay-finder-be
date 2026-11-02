@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 
 import { requireAuth } from "../middleware/auth.js";
-import { createBooking, deleteBookingById, getBookingById, getMyBookings, getOwnedPropertiesBookings, updateBookingById } from "../database/bookings.js";
+import { createBooking, deleteBookingById, getBookingById, getMyBookings, getOwnedPropertiesBookings, updateBookingById, updateBookingStatus } from "../database/bookings.js";
 import type { Booking } from "../types/booking.js";
-import { getPropertyById, updatePropertyById } from "../database/properties.js";
-import { bookingOptionalValidator, bookingValidator } from "../validators/bookingValidator.js";
+import { bookingOptionalValidator, bookingParamValidator, bookingValidator } from "../validators/bookingValidator.js";
 import type { User } from "@supabase/supabase-js";
 
 
@@ -85,11 +84,11 @@ bookings.post("/property/:id", requireAuth, bookingValidator, async (c) => {
   } 
 })
 
-//PATCH BOOKING IF OWNER, can only patch email, name, number of guests, status
+//PATCH BOOKING IF OWNER, can only patch email, name, number of guests, check_in and check_out
 bookings.patch("/:id", requireAuth, bookingOptionalValidator, async (c) => {
   const bookingId = c.req.param("id")
   let bookingBody: Partial<Booking> = c.req.valid("json")
-  delete bookingBody.booking_id, bookingBody.property_id, bookingBody.total_price
+  delete bookingBody.booking_id, bookingBody.property_id, bookingBody.total_price, bookingBody.status
   const sb = c.get("supabase")
 
   try{
@@ -102,9 +101,35 @@ bookings.patch("/:id", requireAuth, bookingOptionalValidator, async (c) => {
   }
 })
 
-//PROPERTY OWNER CAN UPDATE TO CONFIRMED OR CANCELLED
-//OWNER OF BOOKING CAN CANCELL
-//Cannot UPDATE PRICE, property_id, owner_id
+//PATCH BOOKING STATUS IF LOGGED IN TO ACCEPT
+bookings.patch("properties/:id/confirm", bookingParamValidator, requireAuth, async (c) => {
+  const bookingId = c.req.param("id")
+  const sb = c.get("supabase")
+
+  try{
+    const acceptBooking = await updateBookingStatus(sb, "confirmed", bookingId)
+
+    return c.json(acceptBooking)
+  } catch (e) {
+    console.warn("Error in updating property into SB DB", e);
+    return c.json(null, 404);
+  }
+})
+
+//PATCH BOOKING STATUS IF OWNER OF PROPERTY AND ACCEPT
+bookings.patch("properties/:id/cancell", bookingParamValidator, requireAuth, async (c) => {
+  const bookingId = c.req.param("id")
+  const sb = c.get("supabase")
+
+  try{
+    const acceptBooking = await updateBookingStatus(sb, "cancelled", bookingId)
+
+    return c.json(acceptBooking)
+  } catch (e) {
+    console.warn("Error in updating property into SB DB", e);
+    return c.json(null, 404);
+  }
+})
 
 //OWNER CAN DELETE BOOKING
 bookings.delete("/:id", requireAuth, async (c) => {

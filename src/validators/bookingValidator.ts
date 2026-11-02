@@ -50,3 +50,17 @@ export const bookingOptionalValidator = zValidator(
     }
   }
 )
+
+const bookingParamSchema = z.object({
+  id: z.uuid("id Must be valid uuid")
+})
+
+export const bookingParamValidator = zValidator(
+  "param",
+  bookingParamSchema,
+  (result, c) => {
+    if (!result.success) {
+      return c.json(getValidationError(result.error), 400);
+    }
+  },
+)
