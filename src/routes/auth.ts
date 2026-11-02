@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { loginUser, logoutUser, registerUser } from "../database/auth.js";
+import { getUser, loginUser, logoutUser, registerUser } from "../database/auth.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loginValidator, registerValidator } from "../validators/authValidator.js";
 
@@ -61,9 +61,10 @@ auth.post("/logout", requireAuth, async (c) => {
 
         c.set("user", null)
 
-        return c.json({
-          message: "Logged Out"
-        }, 200
+        return c.json(
+          {
+            message: "Logged Out"
+          }, 200
         )
   } catch(e: any) {
     console.warn("Error in logging out", e)
@@ -75,5 +76,43 @@ auth.post("/logout", requireAuth, async (c) => {
     )
   }
 })
+
+auth.get("/me", requireAuth, async (c) => {
+  try{
+    const user = c.get("user")
+
+    return c.json(
+      {
+        user
+      }, 200
+    )
+
+  } catch(e: any) {
+    console.warn("Error in getting user", e)
+    return c.json(
+      {
+        message: e?.message
+      },
+      400
+    )
+  }
+})
+
+auth.get("/me", requireAuth, async (c) => {
+  const sb = c.get("supabase")
+  
+  try{
+    const user = await getUser(sb)
+    return c.json({user}, 200)
+  } catch(e) {
+    console.warn("Error in getting user", e)
+    return c.json(
+      {
+        message: "Error in getting User"
+      }, 500
+    )
+  }
+})
+
 
 export default auth;

@@ -46,3 +46,19 @@ export async function logoutUser(sb: BasicSupabaseClient) {
     throw new Error(error.message)
   }
 }
+
+export async function getUser(sb: BasicSupabaseClient): Promise<AuthUser> {
+  const {data, error} = await sb.auth.getUser()
+  if(!error && data.user) {
+    return{
+      id: data.user.id,
+      email: data.user.email as string,
+      name: data.user.user_metadata.name ?? "",
+    }
+  }
+
+
+  throw error
+
+
+}
