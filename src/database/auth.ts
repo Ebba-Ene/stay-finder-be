@@ -57,8 +57,6 @@ export async function getUser(sb: BasicSupabaseClient): Promise<AuthUser> {
     }
   }
 
-
   throw error
-
 
 }
