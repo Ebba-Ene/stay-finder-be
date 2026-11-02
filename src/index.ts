@@ -6,6 +6,7 @@ import { optionalAuth } from './middleware/auth.js'
 import auth from './routes/auth.js'
 import properties from './routes/properties.js'
 import { env } from './env.js'
+import bookings from './routes/bookings.js'
 
 const app = new Hono({strict: false})
 
@@ -24,6 +25,7 @@ app.get('/', (c) => {
 
 app.route("/auth", auth)
 app.route("/properties", properties)
+app.route("/bookings", bookings)
 
 serve({
   fetch: app.fetch,
