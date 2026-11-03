@@ -1,7 +1,6 @@
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 import type { BasicSupabaseClient } from "../types/supabase.js";
-import type { Database } from "../types/database.types.js";
 import type { NewProperty, Property, PropertyKind, PropertyValidKey } from "../types/property.js";
 
 const TABLE_NAME = "properties"
@@ -23,7 +22,6 @@ const SELECT_QUERY_LIST: PropertyValidKey[] = [
 const SELECT_QUERY= SELECT_QUERY_LIST.join(", ")
 const QUERY_ID = "property_id"
 const QUERY_KIND = "kind_of_property"
-const QUERY_OWNERID = "owner_id"
 
 function selectProperties(sb: BasicSupabaseClient){
   return sb.from(TABLE_NAME).select(SELECT_QUERY)
@@ -36,6 +34,7 @@ type PropertyListFilter = Partial<{
   country: string
   city: string;
   maxGuests: number;
+  sortPrice: string;
 }>
 
 function buildPropertiesFilter(
@@ -56,6 +55,12 @@ function buildPropertiesFilter(
 
   if (filters.city && filters.city.trim().length > 2){
     query = query.ilike("city", `%${filters.city}%`)
+  }
+
+  if (filters.sortPrice) {
+    query.order("price_per_night", {
+      ascending: filters.sortPrice === "asc",
+    })
   }
 }
 
@@ -148,12 +153,14 @@ export async function updatePropertyById(
 //DELETE PROPERTY IF OWNER AND LOGGED IN
 export async function deletePropertyById(
   sb: BasicSupabaseClient,
-  propertyId: string
+  propertyId: string,
+  ownerId: string
 ) {
   const {error}: PostgrestSingleResponse<Property> = await sb
   .from(TABLE_NAME)
   .delete()
   .eq(QUERY_ID, propertyId)
+  .eq("owner_id", ownerId)
   .select()
   .single()
 
