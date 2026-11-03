@@ -11,13 +11,19 @@ const properties = new Hono({ strict: false })
 //GET PROPERTIES FOR LIST VIEW
 properties.get("/", async (c) => {
   const sb = c.get("supabase")
-
+  
   try{
+    const sortParam = c.req.query("sort_price")
+    const sortPrice =
+    sortParam === "asc" || sortParam === "desc"
+      ? sortParam
+      : undefined
     const properties = await getProperties(sb, {
       maxPrice: Number(c.req.query("max_price")) || undefined,
       maxGuests: Number(c.req.query("max_guests")) || undefined,
       country: c.req.query("country"),
       city: c.req.query("city"),
+      sortPrice
     })
     return c.json(properties)
   } catch(e) {
@@ -44,13 +50,19 @@ properties.get("id/:id", async (c) => {
 properties.get("/kind/:kind", propertyParamValidator, async (c) => {
  const kindOfProperty = c.req.valid("param").kind
   const sb = c.get("supabase")
-
+  
   try{
+    const sortParam = c.req.query("sort_price")
+    const sortPrice =
+    sortParam === "asc" || sortParam === "desc"
+      ? sortParam
+      : undefined
     const properties = await getPropertiesByKind(sb, kindOfProperty, {
       maxPrice: Number(c.req.query("max_price")) || undefined,
       maxGuests: Number(c.req.query("max_guests")) || undefined,
       country: c.req.query("country"),
       city: c.req.query("city"),
+      sortPrice
     })
     return c.json(properties)
   } catch (e) {
@@ -97,16 +109,17 @@ properties.patch("/:id", requireAuth, propertyOptionalValidator, async (c) => {
 })
 
 //DELETE PROPERTY IF OWNER AND LOGGED IN
-properties.delete("/:id", requireAuth, async (c) => {
+properties.delete("id/:id", requireAuth, async (c) => {
   const propertyId = c.req.param("id")
   const sb = c.get("supabase")
+  const user = c.get("user") as User
 
   if (!propertyId) {
     return c.json({ error: "Property ID is required" }, 400)
   }
 
   try{
-    await deletePropertyById(sb, propertyId)
+    await deletePropertyById(sb, propertyId, user.id)
 
     return c.json(null, 200)
   } catch (e) {
