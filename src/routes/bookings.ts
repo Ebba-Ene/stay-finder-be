@@ -85,6 +85,11 @@ bookings.post("/property/:id", requireAuth, bookingValidator, async (c) => {
 //PATCH BOOKING IF OWNER, can only patch email, name, number of guests, check_in and check_out
 bookings.patch("/:id", bookingParamValidator, requireAuth, bookingOptionalValidator, async (c) => {
   const bookingId = c.req.param("id")
+  const user = c.get("user")
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
+
   let bookingBody: Partial<Booking> = c.req.valid("json")
   delete bookingBody.booking_id, bookingBody.property_id, bookingBody.total_price, bookingBody.status
   const sb = c.get("supabase")
@@ -109,12 +114,36 @@ bookings.patch("/:id", bookingParamValidator, requireAuth, bookingOptionalValida
     }
 })
 
-//PATCH BOOKING STATUS IF LOGGED IN TO ACCEPT
+//PATCH BOOKING STATUS IF PROPERTY OWNER ACCEPTS
 bookings.patch("properties/:id/confirm", bookingParamValidator, requireAuth, async (c) => {
   const bookingId = c.req.param("id")
   const sb = c.get("supabase")
+  const user = c.get("user")
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
 
   try{
+    const booking = await getBookingById(sb, bookingId)
+    if (!booking.property_id) {
+      return c.json({ error: "The property for this booking is unavailable" }, 404)
+    }
+
+    const { data: property, error: propertyError } = await sb
+      .from("properties")
+      .select("owner_id")
+      .eq("property_id", booking.property_id)
+      .single()
+
+    if (propertyError) {
+      throw propertyError
+    }
+
+    if (property.owner_id !== user.id) {
+      return c.json({ error: "Only the property owner can confirm this booking" }, 403)
+    }
+
     const acceptBooking = await updateBookingStatus(sb, "confirmed", bookingId)
 
     return c.json(acceptBooking)
@@ -134,12 +163,36 @@ bookings.patch("properties/:id/confirm", bookingParamValidator, requireAuth, asy
     }
 })
 
-//PATCH BOOKING STATUS IF OWNER OF PROPERTY AND ACCEPT
+//PATCH BOOKING STATUS IF BOOKING OWNER OR PROPERTY OWNER CANCELS
 bookings.patch("properties/:id/cancell", bookingParamValidator, requireAuth, async (c) => {
   const bookingId = c.req.param("id")
   const sb = c.get("supabase")
+  const user = c.get("user")
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
 
   try{
+    const booking = await getBookingById(sb, bookingId)
+    if (!booking.property_id) {
+      return c.json({ error: "The property for this booking is unavailable" }, 404)
+    }
+
+    const { data: property, error: propertyError } = await sb
+      .from("properties")
+      .select("owner_id")
+      .eq("property_id", booking.property_id)
+      .single()
+
+    if (propertyError) {
+      throw propertyError
+    }
+
+    if (user.id !== booking.owner_id && user.id !== property.owner_id) {
+      return c.json({ error: "Only the booking owner or property owner can cancel this booking" }, 403)
+    }
+
     const acceptBooking = await updateBookingStatus(sb, "cancelled", bookingId)
 
     return c.json(acceptBooking)
