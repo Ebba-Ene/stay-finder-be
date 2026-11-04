@@ -14,9 +14,11 @@ export async function registerUser(sb: BasicSupabaseClient, email: string, passw
   })
 
   if (!error && data.user) {
+
     return {
       id: data.user.id,
-      email: data.user.email as string
+      email: data.user.email as string,
+      name: data.user.user_metadata.name
     }
   }
 
@@ -30,6 +32,7 @@ export async function loginUser(sb: BasicSupabaseClient, email: string, password
   })
 
   if (!error && data.user) {
+
     return {
       id: data.user.id,
       email: data.user.email as string
