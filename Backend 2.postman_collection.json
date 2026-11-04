@@ -1,0 +1,540 @@
+{
+  "info": {
+    "_postman_id": "7ec019ae-c3f2-4223-8da8-1aaba0e54db0",
+    "name": "Backend 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51929446"
+  },
+  "item": [
+    {
+      "name": "Stay Finder",
+      "item": [
+        {
+          "name": "auth",
+          "item": [
+            {
+              "name": "Register",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"cabrina.sarpenter@gmail.com\",\r\n    \"password\": \"test123\",\r\n    \"name\": \"Cabrina Sarpenter\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/auth/register",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"ebba@gmail.com\",\r\n    \"password\": \"test123\"\r\n}\r\n\r\n//cabrina.sarpenter@gmail.com\r\n// testmail@gmail.com",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/auth/login",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/auth/logout",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get me",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/auth/me",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Properties",
+          "item": [
+            {
+              "name": "Get Properties",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/properties/?sort_price=desc",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    ""
+                  ],
+                  "query": [
+                    {
+                      "key": "max_price",
+                      "value": "1000",
+                      "disabled": true
+                    },
+                    {
+                      "key": "city",
+                      "value": "stockholm",
+                      "disabled": true
+                    },
+                    {
+                      "key": "country",
+                      "value": "sweden",
+                      "disabled": true
+                    },
+                    {
+                      "key": "max_guests",
+                      "value": "2",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort_price",
+                      "value": "desc"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Property By Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/properties/id/{{:propertyId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    "id",
+                    "{{:propertyId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Properties By Kind",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/properties/kind/apartment",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    "kind",
+                    "apartment"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Property",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{        \r\n    \"title\": \"test\",\r\n    \"description\": \"test\",\r\n    \"city\": \"Stockholm\",\r\n    \"country\": \"Sweden\",\r\n    \"price_per_night\": 1290,\r\n    \"max_guests\": 2,\r\n    \"kind_of_property\": \"Villa\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/properties",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Property",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"title\": \"Gothic mansion in Stochkholm\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/properties/{{:propertyId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    "{{:propertyId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Property",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/properties/{{:propertyId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    "{{:propertyId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get my properties",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/properties/mine",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "properties",
+                    "mine"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Bookings",
+          "item": [
+            {
+              "name": "Get my bookings",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/bookings/mine",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "mine"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get bookings for my properties",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/bookings/properties/mine",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "properties",
+                    "mine"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get booking by id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Accept booking",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"guest_name\": \"Gia Moth\",\r\n    \"guest_email\": \"moth@gmail.com\",\r\n    \"guests\": 1,\r\n    \"check_in\": \"2030-03-18\",\r\n    \"check_out\": \"2030-03-29\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/bookings/properties/{{:bookingId}}/confirm",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "properties",
+                    "{{:bookingId}}",
+                    "confirm"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create A booking",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"guest_name\": \"Gia Moth\",\r\n    \"guest_email\": \"moth@gmail.com\",\r\n    \"guests\": 6,\r\n    \"check_in\": \"2030-03-18\",\r\n    \"check_out\": \"2030-03-19\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/bookings/property/{{:propertyId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "property",
+                    "{{:propertyId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update booking by id",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"guest_name\": \"Gia Moth\",\r\n    \"guest_email\": \"moth@gmail.com\",\r\n    \"guests\": 1,\r\n    \"check_in\": \"2030-03-18\",\r\n    \"check_out\": \"2030-03-29\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/bookings/{{:bookingId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "{{:bookingId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Confirm Booking",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"guest_name\": \"Gia Moth\",\r\n    \"guest_email\": \"moth@gmail.com\",\r\n    \"guests\": 1,\r\n    \"check_in\": \"2030-03-18\",\r\n    \"check_out\": \"2030-03-29\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURL}}/bookings/properties/{{:bookingId}}/confirm",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "properties",
+                    "{{:bookingId}}",
+                    "confirm"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "New Request",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/bookings/properties/{{:bookingId}}/cancell",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "properties",
+                    "{{:bookingId}}",
+                    "cancell"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Booking",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseURL}}/bookings/{{:bookingId}}",
+                  "host": [
+                    "{{baseURL}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "{{:bookingId}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": ""
+    },
+    {
+      "key": ":propertyId",
+      "value": ""
+    },
+    {
+      "key": ":bookingId",
+      "value": ""
+    },
+    {
+      "value": ""
+    }
+  ]
+}
