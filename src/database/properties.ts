@@ -46,7 +46,7 @@ function buildPropertiesFilter(
   }
 
   if(filters.maxGuests){
-    query = query.lte("max_guests", filters.maxGuests)
+    query = query.gte("max_guests", filters.maxGuests)
   }
 
   if (filters.country && filters.country.trim().length > 2){
