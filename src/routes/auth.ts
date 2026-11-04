@@ -15,18 +15,23 @@ auth.post("/register", registerValidator, async (c) => {
     const user = await registerUser(sb, email, password, name)
 
     return c.json(
-      {user: user}, 200
+      {user: user}, 201
     ) 
 
-  } catch(e: any) {
-    console.warn("Error in registrering", e)
-    return c.json(
-      {
-        message: e?.message
-      },
-      400
-    )
-  }
+  } catch (error: unknown) {
+      console.warn("Error registering user", error)
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "user_already_exists"
+      ) {
+        return c.json({ message: "An account with this email already exists." }, 409)
+      }
+
+      return c.json({ message: "Could not register user." }, 500)
+    }
 })
 
 //POST LOGIN
@@ -42,13 +47,24 @@ auth.post("/login", loginValidator, async (c) => {
       200
     )
 
-  } catch(e: any) {
-    console.warn("Error in registrering", e)
+  } catch (error: unknown) {
+    console.warn("Error logging in", error)
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "invalid_credentials"
+    ) {
+      return c.json(
+        { message: "Invalid email or password." },
+        401
+      )
+    }
+
     return c.json(
-      {
-        message: e?.message
-      },
-      400
+      { message: "Could not log in. Please try again later." },
+      500
     )
   }
 })
@@ -72,7 +88,7 @@ auth.post("/logout", requireAuth, async (c) => {
       {
         message: e?.message
       },
-      400
+      500
     )
   }
 })
@@ -94,7 +110,7 @@ auth.get("/me", requireAuth, async (c) => {
       {
         message: e?.message
       },
-      400
+      500
     )
   }
 })
