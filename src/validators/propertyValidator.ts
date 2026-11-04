@@ -45,6 +45,20 @@ export const propertyParamValidator = zValidator(
   },
 )
 
+const propertyIdParamSchema = z.object({
+  id: z.uuid("Property ID must be a valid UUID"),
+})
+
+export const propertyIdParamValidator = zValidator(
+  "param",
+  propertyIdParamSchema,
+  (result, c) => {
+    if (!result.success) {
+      return c.json(getValidationError(result.error), 400)
+    }
+  },
+)
+
 const propertyOptionalSchema = propertySchema.partial()
 
 export const propertyOptionalValidator = zValidator(

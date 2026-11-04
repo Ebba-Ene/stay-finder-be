@@ -46,13 +46,9 @@ bookings.get("/properties/mine", requireAuth, async (c) => {
 })
 
 //GET BOOKING BY ID
-bookings.get("/:id", requireAuth, async (c) => {
+bookings.get("/:id", requireAuth, bookingParamValidator, async (c) => {
   const bookingId = c.req.param("id")
   const sb = c.get("supabase")
-
-  if (!bookingId) {
-    return c.json({ error: "Booking ID is required" }, 400)
-  }
 
   try{
     const property = await getBookingById(sb, bookingId)

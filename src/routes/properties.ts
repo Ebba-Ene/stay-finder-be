@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import type { User } from "@supabase/supabase-js";
 
 import { createProperty, deletePropertyById, getOwnedProperties, getProperties, getPropertiesByKind, getPropertyById, updatePropertyById } from "../database/properties.js";
-import { propertyOptionalValidator, propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
+import { propertyIdParamValidator, propertyOptionalValidator, propertyParamValidator, propertyValidator } from "../validators/propertyValidator.js";
 import { requireAuth } from "../middleware/auth.js";
 import type { Property } from "../types/property.js";
 
@@ -25,25 +25,39 @@ properties.get("/", async (c) => {
       city: c.req.query("city"),
       sortPrice
     })
-    return c.json(properties)
+    return c.json(properties, 200)
   } catch(e) {
     console.warn("Error in fetching properties from SB database", e)
-    return c.json([])
+
+    return c.json(
+      { error: "Could not fetch properties" },
+      500
+    )
   }
 })
 
 //GET PROPERTY BY ID FOR DETAIL VIEW
-properties.get("id/:id", async (c) => {
+properties.get("id/:id", propertyIdParamValidator, async (c) => {
   const propertyId = c.req.param("id")
   const sb = c.get("supabase")
 
   try{
     const property = await getPropertyById(sb, propertyId)
     return c.json(property)
-  } catch (e) {
-    console.warn("Error in fetching property from SB database", e)
-    return c.json(null, 404)  //404 visar att webbservern inte kunde hitta informationen
-  }
+  } catch (error) {
+      console.warn("Error fetching property from database", error)
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "PGRST116"
+      ) {
+        return c.json({ error: "Property not found" }, 404)
+      }
+
+      return c.json({ error: "Could not fetch property" }, 500)
+    }
 })
 
 //GET PROPERTY BY KIND
@@ -64,10 +78,10 @@ properties.get("/kind/:kind", propertyParamValidator, async (c) => {
       city: c.req.query("city"),
       sortPrice
     })
-    return c.json(properties)
+    return c.json(properties, 200)
   } catch (e) {
-    console.warn("Error in fetching property from SB database", e)
-    return c.json(null, 404)  //404 visar att webbservern inte kunde hitta informationen
+    console.warn("Error in fetching propoerties from SB database", e)
+    return c.json({ error: "Could not fetch properties" }, 500) 
   }
 })
 
@@ -91,41 +105,56 @@ properties.post("/", requireAuth, propertyValidator, async (c) => {
 })
 
 //PATCH PROPERTY IF OWNER AND LOGGED IN
-properties.patch("/:id", requireAuth, propertyOptionalValidator, async (c) => {
+properties.patch("/:id", propertyIdParamValidator, requireAuth, propertyOptionalValidator, async (c) => {
   const propertyId = c.req.param("id");
   let propertyBody: Partial<Property> = c.req.valid("json");
-  delete propertyBody.owner_id
-  delete propertyBody.property_id
+  delete propertyBody.owner_id, propertyBody.property_id
   const sb = c.get("supabase")
 
-    try{
+  try{
     const updatedProperty = await updatePropertyById(sb, propertyBody, propertyId)
 
     return c.json(updatedProperty)
-  } catch (e) {
-    console.warn("Error in updating property into SB DB", e);
-    return c.json(null, 404);
-  } 
+  } catch (error) {
+      console.warn("Error updating property from database", error)
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "PGRST116"
+      ) {
+        return c.json({ error: "Property not found or you do not have permission" }, 404)
+      }
+
+      return c.json({ error: "Could not update property" }, 500)
+    }
 })
 
 //DELETE PROPERTY IF OWNER AND LOGGED IN
-properties.delete("id/:id", requireAuth, async (c) => {
+properties.delete("id/:id", propertyIdParamValidator, requireAuth, async (c) => {
   const propertyId = c.req.param("id")
   const sb = c.get("supabase")
   const user = c.get("user") as User
-
-  if (!propertyId) {
-    return c.json({ error: "Property ID is required" }, 400)
-  }
 
   try{
     await deletePropertyById(sb, propertyId, user.id)
 
     return c.json(null, 200)
-  } catch (e) {
-    console.warn("Error in deleting property into SB DB", e);
-    return c.json(null, 404);
-  } 
+  } catch (error) {
+      console.warn("Error deleting property from database", error)
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "PGRST116"
+      ) {
+        return c.json({ error: "Property not found or you do not have permission" }, 404)
+      }
+
+      return c.json({ error: "Could not delete property" }, 500)
+    }
 })
 
 //GET MY PROPERTIES IF OWNER AND LOGGED IN
@@ -140,9 +169,9 @@ properties.get("/mine", requireAuth, async (c) => {
   try{
     const properties = await getOwnedProperties(sb, user.id)
     return c.json(properties)
-  } catch(e) {
-    console.warn("Error in fetching properties from SB database", e)
-    return c.json([])
+  } catch(error) {
+    console.warn("Error in fetching properties from SB database", error)
+    return c.json({ error: "Could not get properties" }, 500)
   }
 })
 
